@@ -1,0 +1,58 @@
+from selenium import webdriver
+import time
+from selenium.webdriver.common.keys import Keys
+import requests
+
+driver = webdriver.Chrome()
+driver.get("https://www.instagram.com/")
+driver.implicitly_wait(3)
+
+# ID 및 PASSWORD에 본인의 인스타그램 아이디, 비밀번호 기입하여 로그인
+driver.find_element_by_css_selector("#loginForm > div > div:nth-child(1) > div > label > input").send_keys("ID")
+driver.find_element_by_css_selector("#loginForm > div > div:nth-child(2) > div > label > input").send_keys("PASSWORD")
+driver.find_element_by_css_selector("#loginForm > div > div:nth-child(3) > button > div").click()
+time.sleep(1)
+
+# 팝업 종료
+driver.find_element_by_css_selector("#react-root > section > main > div > div > div > div > button").click()
+driver.find_element_by_css_selector("body > div.RnEpo.Yx5HN > div > div > div > div.mt3GC > button.aOOlW.HoLwm").click()
+time.sleep(1)
+
+# ID NAME에 이미지 다운로드 원하는 계정 아이디를 기입
+insta_name = driver.find_element_by_css_selector("#react-root > section > nav > div._8MQSO.Cx7Bp > div > div > div.LWmhU._0aCwM > input")
+insta_name.send_keys('ID NAME')
+time.sleep(1)
+
+insta_name.send_keys(Keys.ENTER)
+insta_name.send_keys(Keys.ENTER)
+time.sleep(1.5)
+
+# 첫번째 게시물 클릭
+driver.find_elements_by_css_selector('._9AhH0')[0].click()
+time.sleep(1)
+
+url_list = []
+
+# 다운로드 원하는 이미지 갯수를 A에 기입
+n = 0
+while n <= A:
+    try:
+        img_url = driver.find_element_by_css_selector('div > div > div.KL4Bh > img').get_attribute('src')
+        url_list.append(img_url)
+    except Exception:
+        pass
+
+    driver.find_element_by_css_selector("body > div._2dDPU.CkGkG > div.EfHg9 > div > div > a._65Bje.coreSpriteRightPaginationArrow").click()
+    time.sleep(1)
+
+    n += 1
+
+# 이미지 다운로드
+for i in range(len(url_list)):
+    final_url = url_list[i]
+    response = requests.get(final_url)
+    filename = 'image{}.jpg'.format(i)
+    with open(filename, 'wb+') as f:
+         f.write(response.content)
+
+driver.quit()
